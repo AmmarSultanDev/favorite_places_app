@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:favorite_places_app/models/place.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
@@ -13,8 +14,17 @@ class LocationInput extends StatefulWidget {
 }
 
 class _LocationInputState extends State<LocationInput> {
-  Location? _pickedLocation;
+  PlaceLocation? _pickedLocation;
   var _isGettingLocation = false;
+
+  String get locationImage {
+    if (_pickedLocation == null) {
+      return '';
+    }
+    final lat = _pickedLocation!.latitude;
+    final lng = _pickedLocation!.longitude;
+    return 'https://maps.googleapis.com/maps/api/staticmap?center=$lat,$lng=&zoom=16&size=600x300&maptype=roadmap&markers=color:red%7Clabel:A%7C$lat,$lng&key=AIzaSyAYEI2OR--w-OHU3AYubkcvBUF0OSU_JGM';
+  }
 
   void _getCurrentLocation() async {
     Location location = Location();
@@ -48,29 +58,45 @@ class _LocationInputState extends State<LocationInput> {
     final latitude = locationData.latitude;
     final longitude = locationData.longitude;
 
-    final String API_KEY = Platform.isAndroid
-        ? 'AIzaSyBbifZ8-pBvf4nEpvCqPnmJrrLoZ1xT004'
-        : 'AIzaSyDFaib7B2rX0uwa8TK6dG8sTufGADFjcZ0';
+    if (latitude == null || longitude == null) {
+      return;
+    }
 
     final url = Uri.parse(
-        'https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=$API_KEY');
+        'https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=AIzaSyAYEI2OR--w-OHU3AYubkcvBUF0OSU_JGM');
 
     final response = await http.get(url);
     final resData = json.decode(response.body);
     final address = resData['results'][0]['formatted_address'];
 
     setState(() {
+      _pickedLocation = PlaceLocation(
+        latitude: latitude,
+        longitude: longitude,
+        address: address,
+      );
       _isGettingLocation = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget previewContent = Text('No Location Chosen',
-        textAlign: TextAlign.center,
-        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-              color: Theme.of(context).colorScheme.onSurface,
-            ));
+    Widget previewContent = Text(
+      'No Location Chosen',
+      textAlign: TextAlign.center,
+      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+    );
+
+    if (_pickedLocation != null) {
+      previewContent = Image.network(
+        locationImage,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+      );
+    }
 
     if (_isGettingLocation) {
       previewContent = const CircularProgressIndicator();
