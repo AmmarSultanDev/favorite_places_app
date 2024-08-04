@@ -52,7 +52,7 @@ class _AddPlaceScreenState extends ConsumerState<AddPlaceScreen> {
             ),
             // Image input
             const SizedBox(height: 10),
-            ImageInput(),
+            const ImageInput(),
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: _savePlace,
