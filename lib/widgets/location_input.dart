@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:favorite_places_app/models/place.dart';
 import 'package:flutter/material.dart';
