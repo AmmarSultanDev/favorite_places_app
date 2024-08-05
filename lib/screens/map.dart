@@ -10,11 +10,11 @@ class MapScreen extends StatefulWidget {
       longitude: -122.084,
       address: '',
     ),
-    isSelecting = true,
+    this.isSelecting = true,
   });
 
   final PlaceLocation location;
-  final bool isSelecting = true;
+  final bool isSelecting;
 
   @override
   State<MapScreen> createState() => _MapScreenState();
